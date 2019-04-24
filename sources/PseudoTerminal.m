@@ -761,7 +761,21 @@ static NSRect iTermRectCenteredVerticallyWithinRect(NSRect frameToCenter, NSRect
                                                 color:[NSColor windowBackgroundColor]
                                        tabBarDelegate:self
                                              delegate:self] autorelease];
+    [_contentView setWantsLayer:YES];
+    _contentView.layer.cornerRadius = 16;
+    _contentView.layer.masksToBounds = YES;
+    _contentView.translatesAutoresizingMaskIntoConstraints = false;
     self.window.contentView = _contentView;
+    [[self.window standardWindowButton:NSWindowCloseButton] setHidden:YES];
+    [[self.window standardWindowButton:NSWindowMiniaturizeButton] setHidden:YES];
+    [[self.window standardWindowButton:NSWindowZoomButton] setHidden:YES];
+    [self.window setMovableByWindowBackground:true];
+    self.window.titlebarAppearsTransparent = true;
+    self.window.styleMask |= NSWindowStyleMaskFullSizeContentView;
+    self.window.titleVisibility = NSWindowTitleHidden;
+    self.window.appearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantDark];
+    NSColor *myColor = NSColor.clearColor;
+    self.window.backgroundColor = myColor;
     if (hotkeyWindowType == iTermHotkeyWindowTypeNone) {
         self.window.alphaValue = 1;
     } else {
@@ -4302,7 +4316,7 @@ ITERM_WEAKLY_REFERENCEABLE
                      initialFrame:[self traditionalFullScreenFrameForScreen:self.window.screen]];
     [self.window.ptyWindow setLayoutDone];
     self.window.contentView = _contentView;
-    self.window.opaque = NO;
+    // self.window.opaque = NO;
     self.window.delegate = self;
     [oldWindow close];
 }
@@ -4317,7 +4331,7 @@ ITERM_WEAKLY_REFERENCEABLE
         }
     }
     self.windowType = WINDOW_TYPE_TRADITIONAL_FULL_SCREEN;
-    [self.window setOpaque:NO];
+    // [self.window setOpaque:NO];
     self.window.alphaValue = 0;
     if (self.ptyWindow.isCompact) {
         [self replaceWindowWithWindowOfType:WINDOW_TYPE_TRADITIONAL_FULL_SCREEN];
@@ -6001,9 +6015,9 @@ ITERM_WEAKLY_REFERENCEABLE
 
 - (void)setBackgroundColor:(nullable NSColor *)backgroundColor {
     if (@available(macOS 10.14, *)) {
-        [self setMojaveBackgroundColor:backgroundColor];
+        // [self setMojaveBackgroundColor:backgroundColor];
     } else {
-        [self setLegacyBackgroundColor:backgroundColor];
+        // [self setLegacyBackgroundColor:backgroundColor];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:iTermWindowAppearanceDidChange object:self.window];
 }
@@ -6031,8 +6045,7 @@ ITERM_WEAKLY_REFERENCEABLE
             self.window.appearance = [NSAppearance appearanceNamed:NSAppearanceNameDarkAqua];
             break;
     }
-    self.window.backgroundColor = self.anyPaneIsTransparent ? [NSColor clearColor] : [NSColor windowBackgroundColor];
-    self.window.titlebarAppearsTransparent = [self titleBarShouldAppearTransparent];  // Keep it from showing content from other windows behind it. Issue 7108.
+    // self.window.titlebarAppearsTransparent = [self titleBarShouldAppearTransparent];  // Keep it from showing content from other windows behind it. Issue 7108.
 }
 
 - (BOOL)titleBarShouldAppearTransparent {
@@ -6142,7 +6155,9 @@ ITERM_WEAKLY_REFERENCEABLE
         }
         darkAppearance = (backgroundColor != nil && backgroundColor.perceivedBrightness < 0.5);
     }
-    [self.window setBackgroundColor:backgroundColor];
+
+    // self.window.styleMask = NSWindowStyleMaskBorderless;
+    // [self.window setBackgroundColor:backgroundColor];
     if (darkAppearance) {
         self.window.appearance = [NSAppearance appearanceNamed:NSAppearanceNameVibrantDark];
     } else {
